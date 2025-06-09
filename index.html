@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEUMPO - Dashboard</title>
+    <style>
+      /* Reset and Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      /* Phone Container */
+      .phone-container {
+        width: 380px;
+        min-height: 700px;
+        background: #ffffff;
+        border-radius: 25px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        border: 3px solid #e0e0e0;
+        position: relative;
+      }
+
+      /* Status Bar */
+      .status-bar {
+        height: 35px;
+        background: #1c1c1e;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        font-size: 14px;
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .battery-wifi {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* Connection Indicator */
+      .connection-indicator {
+        position: absolute;
+        top: 40px;
+        right: 35px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ff3b30;
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .connection-indicator.connected {
+        background: #34c759;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Dashboard Header */
+      .dashboard-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 30px 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 2px solid #dee2e6;
+        position: relative;
+      }
+
+      .dashboard-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #343a40;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 5px;
+      }
+
+      .dashboard-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .notification-icon {
+        position: absolute;
+        top: 30px;
+        right: 55px;
+        font-size: 24px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+
+      .notification-icon:hover {
+        transform: scale(1.1);
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 10px;
+        height: 10px;
+        background: #ff3b30;
+        border-radius: 50%;
+        display: none;
+      }
+
+      /* Dashboard Content */
+      .dashboard-content {
+        padding: 25px;
+        background: #f8f9fa;
+        min-height: 500px;
+      }
+
+      /* Card Styles */
+      .card {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 18px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      .card h3 {
+        font-size: 22px;
+        color: #343a40;
+        margin: 0;
+        font-weight: 700;
+        cursor: pointer; /* Memberikan indikasi bahwa teks bisa diklik */
+      }
+
+      .lamp-icon {
+        font-size: 32px;
+        transition: all 0.3s ease;
+      }
+
+      .lamp-icon.active {
+        filter: drop-shadow(0 0 12px rgba(255, 193, 7, 0.8));
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+
+      .lamp-icon.flickering {
+        animation: flicker 0.5s ease-in-out infinite;
+      }
+
+      @keyframes glow {
+        from {
+          filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.6));
+        }
+        to {
+          filter: drop-shadow(0 0 16px rgba(255, 193, 7, 1));
+        }
+      }
+
+      @keyframes flicker {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* Status Section */
+      .status-section {
+        margin-bottom: 20px;
+      }
+
+      .status-label {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+      }
+
+      .status-value {
+        font-weight: 700;
+        font-size: 18px;
+        padding: 10px 18px;
+        border-radius: 25px;
+        display: inline-block;
+        transition: all 0.3s ease;
+        min-width: 100px;
+        text-align: center;
+      }
+
+      /* FSM Status Colors */
+      .fsm-normal {
+        color: #28a745;
+        background: rgba(40, 167, 69, 0.15);
+        border: 2px solid rgba(40, 167, 69, 0.3);
+      }
+
+      .fsm-redup {
+        color: #fd7e14;
+        background: rgba(253, 126, 20, 0.15);
+        border: 2px solid rgba(253, 126, 20, 0.3);
+      }
+
+      .fsm-berkedip {
+        color: #dc3545;
+        background: rgba(220, 53, 69, 0.15);
+        border: 2px solid rgba(220, 53, 69, 0.3);
+        animation: blink 1s infinite;
+      }
+
+      .fsm-rusak {
+        color: #e83e8c;
+        background: rgba(232, 62, 140, 0.15);
+        border: 2px solid rgba(232, 62, 140, 0.3);
+      }
+
+      .status-waiting {
+        color: #17a2b8;
+        background: rgba(23, 162, 184, 0.15);
+        border: 2px solid rgba(23, 162, 184, 0.3);
+        animation: blink 1.5s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+        51%,
+        100% {
+          opacity: 0.5;
+        }
+      }
+
+      /* Control Section */
+      .control-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+      }
+
+      .control-label {
+        font-size: 16px;
+        color: #495057;
+        font-weight: 600;
+      }
+
+      /* Toggle Switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 36px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 36px;
+        transition: 0.4s;
+        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 28px;
+        width: 28px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      }
+
+      input:checked + .slider {
+        background: linear-gradient(135deg, #28a745, #20c997);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(34px);
+      }
+
+      input:disabled + .slider {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Description Card */
+      .description-card {
+        background: linear-gradient(135deg, #66c5ea, #6bc9a3);
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      .description-card::before {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Footer */
+      .footer {
+        padding: 15px 25px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 12px;
+        border-top: 2px solid #e9ecef;
+        background: #f8f9fa;
+      }
+
+      .footer div:first-child {
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 5px;
+      }
+
+      /* Loading Overlay */
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #e9ecef;
+        border-top: 5px solid #1e3c72;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Message Styles */
+      .error-message,
+      .success-message {
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        display: none;
+        font-weight: 600;
+      }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+      }
+
+      /* Mode Indicator */
+      .mode-indicator {
+        position: absolute;
+        top: 70px;
+        right: 25px;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .mode-auto {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+      }
+
+      .mode-manual {
+        background: rgba(253, 126, 20, 0.2);
+        color: #fd7e14;
+        border: 1px solid #fd7e14;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 420px) {
+        .phone-container {
+          width: 100%;
+          max-width: 350px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone-container">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+      </div>
+
+      <div class="status-bar">
+        <div class="time" id="currentTime">12:34</div>
+        <div class="battery-wifi">
+          <span>📶</span>
+          <span>🔋</span>
+        </div>
+      </div>
+
+      <div class="dashboard-header">
+        <div class="dashboard-title">LEUMPO</div>
+        <div class="dashboard-subtitle">Sistem Lampu Jalan Pintar</div>
+        <div class="notification-icon" id="notificationIcon">
+          🔔
+          <div class="notification-badge" id="notificationBadge"></div>
+        </div>
+        <div class="connection-indicator" id="connectionIndicator"></div>
+        <div class="mode-indicator mode-auto" id="modeIndicator">AUTO</div>
+      </div>
+
+      <div class="dashboard-content">
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 id="lampTitle">LAMPU 1</h3>
+            <div class="lamp-icon" id="lampIcon">💡</div>
+          </div>
+
+          <div class="status-section">
+            <div class="status-label">Status Lampu</div>
+            <span class="status-value status-waiting" id="fsmStatus"
+              >Menunggu...</span
+            >
+          </div>
+
+          <div class="status-section">
+            <div class="status-label">Kecerahan Cahaya</div>
+            <span class="status-value" id="brightnessValue">--%</span>
+          </div>
+
+          <div class="control-section">
+            <div class="control-label">Kontrol Manual</div>
+            <label class="switch">
+              <input type="checkbox" id="lampToggle" disabled />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card description-card" id="descriptionCard">
+          <div id="fsmDescription">Menunggu data dari ESP32...</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>LEUMPO: Sistem Lampu Jalan Pintar</div>
+        <div>Koneksi: <span id="firebaseStatus">Menghubungkan...</span></div>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+      // Ganti dengan konfigurasi Firebase Anda dari Firebase Console
+      const firebaseConfig = {
+        apiKey: "AIzaSyBYcAi27NPeenFWxkEiEtXKJ7a5a9gFeV8",
+        authDomain: "leumpo-b38cd.firebaseapp.com",
+        projectId: "leumpo-b38cd",
+        storageBucket: "leumpo-b38cd.firebasestorage.app",
+        messagingSenderId: "753765459612",
+        appId: "1:753765459612:web:0097375d88a864e94b2f59",
+      };
+
+      // Inisialisasi Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore(); // Dapatkan instance Firestore
+
+      // Device ID yang sama dengan di ESP32
+      const LIGHT_DEVICE_ID = "light_001";
+      const DEVICE_DOC_REF = db.collection("devices").doc(LIGHT_DEVICE_ID);
+      const COMMAND_DOC_REF = db
+        .collection("commands")
+        .doc(LIGHT_DEVICE_ID + "_cmd");
+
+      let isConnected = false; // Status koneksi ke Firebase
+
+      // DOM Elements
+      const elements = {
+        connectionIndicator: document.getElementById("connectionIndicator"),
+        fsmStatus: document.getElementById("fsmStatus"),
+        brightnessValue: document.getElementById("brightnessValue"),
+        lampToggle: document.getElementById("lampToggle"),
+        lampIcon: document.getElementById("lampIcon"),
+        firebaseStatus: document.getElementById("firebaseStatus"), // Diperbarui untuk nama yang lebih akurat
+        currentTime: document.getElementById("currentTime"),
+        errorMessage: document.getElementById("errorMessage"),
+        successMessage: document.getElementById("successMessage"),
+        loadingOverlay: document.getElementById("loadingOverlay"),
+        notificationBadge: document.getElementById("notificationBadge"),
+        fsmDescription: document.getElementById("fsmDescription"),
+        modeIndicator: document.getElementById("modeIndicator"),
+        lampTitle: document.getElementById("lampTitle"),
+      };
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🚀 LEUMPO Dashboard Starting...");
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        showLoading(true);
+        // Atur toggle agar nonaktif di awal sampai koneksi terjalin
+        elements.lampToggle.disabled = true;
+        setTimeout(initializeFirebaseListeners, 1000);
+
+        elements.lampToggle.addEventListener("change", handleToggleChange);
+        elements.lampTitle.addEventListener("click", handleLampTitleClick);
+      });
+
+      function handleLampTitleClick() {
+        // Mengarahkan ke halaman riwayat.html saat teks "LAMPU 1" diklik
+        window.location.href = "/riwayat.html";
+      }
+
+      // Update time display
+      function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        elements.currentTime.textContent = timeString;
+      }
+
+      // Inisialisasi Listener Firebase
+      function initializeFirebaseListeners() {
+        console.log(
+          "🔗 Listening to Firebase Cloud Firestore for device status..."
+        );
+        updateFirebaseStatus("Menghubungkan...");
+
+        DEVICE_DOC_REF.onSnapshot(
+          (doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              console.log("📥 Firebase update:", data);
+              isConnected = true;
+              updateConnectionStatus(true);
+              updateFirebaseStatus("Terhubung");
+              showLoading(false);
+              // showSuccessMessage("Berhasil terhubung ke Firestore");
+
+              // Aktifkan toggle ketika terhubung dan data diterima
+              elements.lampToggle.disabled = false;
+
+              // Update UI dengan data terbaru
+              if (data.currentStatus) updateFSMStatus(data.currentStatus);
+              if (typeof data.brightness === "number")
+                updateBrightness(data.brightness);
+              if (data.relayState) updateRelayStatus(data.relayState);
+              if (data.systemMode) updateModeStatus(data.systemMode);
+              if (data.description) updateDescription(data.description);
+            } else {
+              console.log(
+                "Doc 'light_001' does not exist in 'devices' collection."
+              );
+              isConnected = false;
+              updateConnectionStatus(false);
+              updateFirebaseStatus("Tidak ada data");
+              showErrorMessage(
+                "Dokumen perangkat tidak ditemukan di Firestore"
+              );
+              showLoading(false);
+              // Nonaktifkan toggle jika tidak ada data
+              elements.lampToggle.disabled = true;
+            }
+          },
+          (error) => {
+            console.error("❌ Firebase listener error:", error);
+            isConnected = false;
+            updateConnectionStatus(false);
+            updateFirebaseStatus("Error");
+            showErrorMessage("Gagal terhubung ke Firebase: " + error.message);
+            showLoading(false);
+            // Nonaktifkan toggle jika ada error
+            elements.lampToggle.disabled = true;
+          }
+        );
+      }
+
+      // Fungsi Pengiriman Perintah ke Firebase
+      function sendFirebaseCommand(commandType, value) {
+        if (!isConnected) {
+          showErrorMessage("Tidak terhubung ke Firebase");
+          return;
+        }
+
+        const dataToSend = {};
+        if (commandType === "toggleLamp") {
+          dataToSend.toggleLamp = value;
+        } else if (commandType === "setMode") {
+          dataToSend.setMode = value;
+        }
+        dataToSend.timestamp = firebase.firestore.FieldValue.serverTimestamp(); // Tambahkan timestamp
+
+        COMMAND_DOC_REF.set(dataToSend, { merge: true }) // merge: true agar tidak menimpa field lain
+          .then(() => {
+            console.log(
+              `✅ Command sent to Firestore: ${commandType} = ${value}`
+            );
+            // showSuccessMessage(
+            //   `Perintah "${commandType}: ${value}" berhasil dikirim`
+            // );
+          })
+          .catch((error) => {
+            console.error("❌ Failed to send command to Firestore:", error);
+            showErrorMessage("Gagal mengirim perintah: " + error.message);
+          });
+      }
+
+      // Update FSM Status
+      function updateFSMStatus(status) {
+        console.log(`🔄 FSM Status: ${status}`);
+        const statusElement = elements.fsmStatus;
+        statusElement.textContent = getStatusDisplayText(status);
+        statusElement.className = "status-value " + getFSMStatusClass(status);
+        updateLampIcon(status);
+      }
+
+      // Update brightness
+      function updateBrightness(brightness) {
+        elements.brightnessValue.textContent = brightness.toFixed(1) + "%";
+        elements.brightnessValue.className =
+          "status-value " + getBrightnessClass(brightness);
+      }
+
+      // Update relay status (lampToggle)
+      function updateRelayStatus(status) {
+        const isOn = status.toUpperCase() === "ON";
+        // Hapus listener sementara untuk menghindari trigger event saat update UI
+        elements.lampToggle.removeEventListener("change", handleToggleChange);
+        elements.lampToggle.checked = isOn;
+        // Tambahkan kembali listener setelah update UI
+        setTimeout(() => {
+          elements.lampToggle.addEventListener("change", handleToggleChange);
+        }, 100);
+      }
+
+      // Update mode status
+      function updateModeStatus(mode) {
+        const modeElement = elements.modeIndicator;
+        modeElement.textContent = mode;
+        modeElement.className =
+          "mode-indicator " + (mode === "AUTO" ? "mode-auto" : "mode-manual");
+      }
+
+      // Update description
+      function updateDescription(description) {
+        elements.fsmDescription.textContent = description;
+      }
+
+      // Get status display text
+      function getStatusDisplayText(status) {
+        switch (status.toUpperCase()) {
+          case "NORMAL":
+            return "Normal";
+          case "REDUP":
+            return "Redup";
+          case "BERKEDIP":
+            return "Berkedip";
+          case "RUSAK":
+            return "Rusak";
+          default:
+            return status;
+        }
+      }
+
+      // Get FSM status CSS class
+      function getFSMStatusClass(status) {
+        switch (status.toUpperCase()) {
+          case "NORMAL":
+            return "fsm-normal";
+          case "REDUP":
+            return "fsm-redup";
+          case "BERKEDIP":
+            return "fsm-berkedip";
+          case "RUSAK":
+            return "fsm-rusak";
+          default:
+            return "status-waiting";
+        }
+      }
+
+      // Get brightness class
+      function getBrightnessClass(brightness) {
+        if (brightness > 70) return "fsm-normal";
+        if (brightness > 30) return "fsm-redup";
+        return "fsm-rusak";
+      }
+
+      // Update lamp icon
+      function updateLampIcon(status) {
+        const icon = elements.lampIcon;
+        icon.className = "lamp-icon"; // Reset class
+
+        switch (status.toUpperCase()) {
+          case "NORMAL":
+            icon.textContent = "💡";
+            icon.classList.add("active");
+            break;
+          case "REDUP":
+            icon.textContent = "🔅";
+            icon.classList.add("active");
+            break;
+          case "BERKEDIP":
+            icon.textContent = "⚡";
+            icon.classList.add("active", "flickering");
+            break;
+          case "RUSAK":
+            icon.textContent = "⚠️";
+            break;
+          default:
+            icon.textContent = "💡"; // Default icon
+        }
+      }
+
+      // Handle toggle change
+      function handleToggleChange(event) {
+        if (!isConnected) {
+          showErrorMessage("Tidak terhubung ke Firebase");
+          event.target.checked = !event.target.checked; // Kembalikan posisi toggle
+          return;
+        }
+
+        const isOn = event.target.checked;
+        elements.lampToggle.disabled = true; // Nonaktifkan sementara saat mengirim perintah
+        sendFirebaseCommand("toggleLamp", isOn); // Kirim boolean ke Firebase
+
+        // Aktifkan kembali toggle setelah beberapa waktu
+        setTimeout(() => {
+          elements.lampToggle.disabled = false;
+        }, 1000);
+      }
+
+      // Update connection status
+      function updateConnectionStatus(connected) {
+        if (connected) {
+          elements.connectionIndicator.classList.add("connected");
+          elements.connectionIndicator.classList.remove("disconnected");
+        } else {
+          elements.connectionIndicator.classList.remove("connected");
+          elements.connectionIndicator.classList.add("disconnected");
+        }
+      }
+
+      // Update Firebase connection status
+      function updateFirebaseStatus(status) {
+        elements.firebaseStatus.textContent = status;
+      }
+
+      // Show/hide loading overlay
+      function showLoading(show) {
+        elements.loadingOverlay.style.display = show ? "flex" : "none";
+      }
+
+      // Show messages
+      function showErrorMessage(message) {
+        elements.errorMessage.textContent = message;
+        elements.errorMessage.style.display = "block";
+        elements.successMessage.style.display = "none";
+
+        setTimeout(() => {
+          elements.errorMessage.style.display = "none";
+        }, 5000);
+
+        showNotificationBadge();
+      }
+
+      function showSuccessMessage(message) {
+        elements.successMessage.textContent = message;
+        elements.successMessage.style.display = "block";
+        elements.errorMessage.style.display = "none";
+
+        setTimeout(() => {
+          elements.successMessage.style.display = "none";
+        }, 3000);
+      }
+
+      function showNotificationBadge() {
+        elements.notificationBadge.style.display = "block";
+        setTimeout(() => {
+          elements.notificationBadge.style.display = "none";
+        }, 10000);
+      }
+
+      // Debug functions (disesuaikan untuk Firebase)
+      window.sendDebugCommand = function (command) {
+        console.log(`🐛 Debug: Sending command "${command}"`);
+        if (command === "hidupkan" || command === "on") {
+          sendFirebaseCommand("toggleLamp", true);
+        } else if (command === "matikan" || command === "off") {
+          sendFirebaseCommand("toggleLamp", false);
+        } else if (command === "status") {
+          // Firebase listener otomatis memperbarui, tidak perlu perintah status manual
+          showSuccessMessage("Status otomatis diperbarui dari Firebase.");
+        } else {
+          showErrorMessage("Perintah debug tidak dikenal untuk Firebase.");
+        }
+      };
+
+      window.setAutoMode = function () {
+        sendFirebaseCommand("setMode", "AUTO");
+      };
+
+      window.setManualMode = function () {
+        sendFirebaseCommand("setMode", "MANUAL");
+      };
+
+      window.requestStatus = function () {
+        // Firebase listener otomatis memperbarui, tidak perlu perintah status manual
+        showSuccessMessage("Status otomatis diperbarui dari Firebase.");
+      };
+
+      window.getFirebaseStatus = function () {
+        console.log("📊 Firebase Status:");
+        console.log("Connected:", isConnected);
+        console.log("Project ID:", firebaseConfig.projectId);
+        console.log("Device ID:", LIGHT_DEVICE_ID);
+        return {
+          connected: isConnected,
+          projectId: firebaseConfig.projectId,
+          deviceId: LIGHT_DEVICE_ID,
+        };
+      };
+
+      // Console info
+      console.log("🔧 Available debug functions:");
+      console.log(
+        "- sendDebugCommand('hidupkan'|'matikan'): Send debug command"
+      );
+      console.log("- getFirebaseStatus(): Get current Firebase status");
+      console.log("- setAutoMode(): Switch to AUTO mode");
+      console.log("- setManualMode(): Switch to MANUAL mode");
+      console.log(
+        "- requestStatus(): (Status otomatis terupdate dari Firebase)"
+      );
+    </script>
+  </body>
+</html>
