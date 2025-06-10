@@ -12,30 +12,64 @@
         box-sizing: border-box;
       }
 
+      /* Pastikan html dan body mengisi seluruh tinggi viewport */
+      html,
+      body {
+        height: 100%; /* Penting untuk mobile agar 100% tinggi */
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Pastikan tidak ada overflow horizontal pada body */
+      }
+
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           "Helvetica Neue", Arial, sans-serif;
+        /* Default background for larger screens */
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 20px;
+        padding: 20px; /* Padding ini hanya berlaku di desktop */
       }
 
-      /* Phone Container */
+      /* Phone Container - Apply only on larger screens by default */
       .phone-container {
         width: 380px;
+        /* Mengatur tinggi minimum dan maksimum seperti halaman index untuk konsistensi di desktop */
         min-height: 700px;
+        max-height: 90vh; /* Sesuaikan sedikit agar ada ruang jika kontennya sangat panjang */
         background: #ffffff;
         border-radius: 25px;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
+        /* Memungkinkan scrolling jika konten di dalamnya melebihi max-height */
+        overflow-y: auto;
+        overflow-x: hidden; /* Mencegah scrolling horizontal */
         border: 3px solid #e0e0e0;
         position: relative;
+        display: flex; /* Mengaktifkan Flexbox */
+        flex-direction: column; /* Mengatur tata letak vertikal */
       }
 
-      /* Status Bar */
+      /* Scrollbar styling for phone-container on larger screens */
+      .phone-container::-webkit-scrollbar {
+        width: 6px; /* Mengurangi lebar scrollbar */
+      }
+
+      .phone-container::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light track */
+        border-radius: 10px;
+      }
+
+      .phone-container::-webkit-scrollbar-thumb {
+        background: #ced4da; /* Muted gray thumb */
+        border-radius: 10px;
+      }
+
+      .phone-container::-webkit-scrollbar-thumb:hover {
+        background: #adb5bd; /* Darker on hover */
+      }
+
+      /* Status Bar (Default - visible and sticky on larger screens) */
       .status-bar {
         height: 35px;
         background: #1c1c1e;
@@ -46,6 +80,78 @@
         font-size: 14px;
         color: #ffffff;
         font-weight: 600;
+        position: sticky; /* Membuat status bar sticky */
+        top: 0; /* Menempel di bagian atas saat di-scroll */
+        z-index: 10; /* Pastikan di atas konten lain */
+      }
+
+      /* Media query for smaller screens (e.g., mobile phones) */
+      @media (max-width: 768px) {
+        body {
+          background: #f8f9fa; /* Match dashboard-content background for seamless look */
+          padding: 0; /* Remove padding */
+          display: block; /* Menggunakan block display untuk mobile */
+          /* align-items dan justify-content tidak relevan dengan display: block */
+        }
+
+        .phone-container {
+          width: 100%; /* Full width */
+          height: 100%; /* Menggunakan height: 100% agar mengisi penuh tinggi layar di HP */
+          min-height: unset; /* Hapus min-height agar bisa full height di HP */
+          max-height: unset; /* Hapus max-height agar bisa full height di HP */
+          border-radius: 0; /* Remove border-radius */
+          box-shadow: none; /* Remove shadow */
+          border: none; /* Remove border */
+          overflow-y: auto; /* Allow scrolling if content overflows */
+          overflow-x: hidden; /* Mencegah scrolling horizontal */
+          margin: 0; /* Remove any margin */
+        }
+
+        /* Hapus status bar di HP */
+        .status-bar {
+          display: none;
+        }
+
+        .dashboard-content {
+          padding: 15px; /* Adjust padding for smaller screens */
+          flex-grow: 1; /* Penting: agar konten mengambil ruang sisa */
+          min-height: unset; /* Hapus min-height agar tidak mengganggu flex-grow */
+          max-height: unset; /* Hapus max-height agar tidak mengganggu scrolling */
+        }
+
+        .dashboard-header {
+          padding: 10px 15px; /* Mengurangi padding vertikal untuk tampilan yang lebih ringkas di HP */
+          position: sticky; /* Pastikan sticky juga di HP */
+          top: 0; /* Menempel di bagian paling atas saat di-scroll di HP */
+          z-index: 9; /* Z-index yang lebih tinggi untuk header di mobile */
+        }
+
+        .back-button {
+          /* Sesuaikan margin-bottom agar konsisten dengan padding header yang baru */
+          margin-bottom: 10px;
+        }
+
+        .connection-indicator {
+          right: 15px; /* Sesuaikan posisi agar tidak terpotong di HP */
+          top: 10px; /* Sesuaikan posisi top agar konsisten dengan padding header yang baru */
+        }
+
+        .card {
+          padding: 20px; /* Adjust card padding for smaller screens */
+          margin-bottom: 15px; /* Adjust margin for smaller screens */
+        }
+
+        .chart-legend {
+          flex-direction: column; /* Stack legend items vertically on small screens */
+          align-items: flex-start;
+          gap: 10px; /* Increase gap for better spacing */
+        }
+
+        .footer {
+          position: sticky; /* Pastikan sticky juga di HP */
+          bottom: 0; /* Menempel di bagian bawah */
+          z-index: 10; /* Pastikan z-index tetap */
+        }
       }
 
       .battery-wifi {
@@ -54,7 +160,7 @@
         align-items: center;
       }
 
-      /* Dashboard Header */
+      /* Dashboard Header (Default - sticky on desktop) */
       .dashboard-header {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 20px 25px;
@@ -62,7 +168,9 @@
         flex-direction: column;
         align-items: flex-start;
         border-bottom: 2px solid #dee2e6;
-        position: relative;
+        position: sticky; /* Membuat header sticky */
+        top: 0;
+        z-index: 9; /* Di bawah status bar, tapi di atas konten */
       }
 
       .back-button {
@@ -100,7 +208,7 @@
       .connection-indicator {
         position: absolute;
         top: 20px;
-        right: 25px;
+        right: 25px; /* Default untuk desktop */
         width: 12px;
         height: 12px;
         border-radius: 50%;
@@ -134,9 +242,7 @@
       .dashboard-content {
         padding: 25px;
         background: #f8f9fa;
-        min-height: 500px;
-        max-height: 500px;
-        overflow-y: auto;
+        flex-grow: 1;
       }
 
       /* Messages */
@@ -217,13 +323,14 @@
 
       /* History Container */
       .history-container {
-        max-height: 300px;
+        max-height: 300px; /* Keep max-height for scrolling history */
         overflow-y: auto;
         padding-right: 5px;
       }
 
+      /* Scrollbar styling for history-container */
       .history-container::-webkit-scrollbar {
-        width: 6px;
+        width: 4px; /* Mengurangi lebar scrollbar */
       }
 
       .history-container::-webkit-scrollbar-track {
@@ -232,12 +339,12 @@
       }
 
       .history-container::-webkit-scrollbar-thumb {
-        background: #1e3c72;
+        background: #ced4da; /* Muted gray thumb */
         border-radius: 10px;
       }
 
       .history-container::-webkit-scrollbar-thumb:hover {
-        background: #2a5298;
+        background: #adb5bd; /* Darker on hover */
       }
 
       /* History Items */
@@ -392,6 +499,14 @@
         background: #dc3545;
       }
 
+      .map-container iframe {
+        border: 0;
+        width: 100%;
+        height: 200px;
+        border-radius: 12px;
+        display: block;
+      }
+
       /* Footer */
       .footer {
         padding: 15px 25px;
@@ -400,6 +515,10 @@
         font-size: 12px;
         border-top: 2px solid #e9ecef;
         background: #f8f9fa;
+        margin-top: auto; /* Penting: dorong footer ke bawah */
+        position: sticky; /* Membuat footer sticky */
+        bottom: 0; /* Menempel di bagian bawah saat di-scroll */
+        z-index: 10; /* Pastikan di atas konten lain */
       }
 
       .footer div:first-child {
@@ -437,26 +556,6 @@
         }
         100% {
           transform: rotate(360deg);
-        }
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 400px) {
-        .phone-container {
-          width: 100%;
-          margin: 10px;
-        }
-
-        .dashboard-content {
-          padding: 20px;
-        }
-
-        .chart-legend {
-          gap: 4px;
-        }
-
-        .legend-item {
-          font-size: 11px;
         }
       }
     </style>
@@ -528,6 +627,20 @@
               <span class="legend-color legend-rusak"></span>
               <span>Rusak</span>
             </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Map</h3>
+          </div>
+          <div class="map-container">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30940.716676851822!2d95.32494264742917!3d5.566855892465544!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304037ba2f883bdb%3A0x96cf41baad212cf!2sLab%20Terpadu%20Universitas%20Syiah%20Kuala!5e1!3m2!1sid!2sid!4v1749535530160!5m2!1sid!2sid"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
           </div>
         </div>
       </div>
@@ -604,7 +717,7 @@
 
       // Go back to main page
       function goBack() {
-        window.location.href = "/LEUMPO"; // Mengarahkan ke dashboard.html
+        window.location.href = "index.html"; // Mengarahkan ke dashboard.html
       }
 
       // Initialize Chart
