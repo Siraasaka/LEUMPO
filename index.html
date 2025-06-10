@@ -13,8 +13,9 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto,
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           "Helvetica Neue", Arial, sans-serif;
+        /* Default background for larger screens */
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         min-height: 100vh;
         display: flex;
@@ -23,7 +24,7 @@
         padding: 20px;
       }
 
-      /* Phone Container */
+      /* Phone Container - Apply only on larger screens */
       .phone-container {
         width: 380px;
         min-height: 700px;
@@ -33,9 +34,11 @@
         overflow: hidden;
         border: 3px solid #e0e0e0;
         position: relative;
+        display: flex; /* Tambahkan ini */
+        flex-direction: column; /* Tambahkan ini */
       }
 
-      /* Status Bar */
+      /* Status Bar (Default - visible on larger screens) */
       .status-bar {
         height: 35px;
         background: #1c1c1e;
@@ -46,6 +49,44 @@
         font-size: 14px;
         color: #ffffff;
         font-weight: 600;
+      }
+
+      /* Media query for smaller screens */
+      @media (max-width: 768px) {
+        body {
+          /* Remove background gradient for smaller screens */
+          background: #f8f9fa; /* Match dashboard-content background for seamless look */
+          padding: 0; /* Remove padding */
+          align-items: flex-start; /* Align to top for full-height content */
+        }
+
+        .phone-container {
+          width: 100%; /* Full width */
+          min-height: 100vh; /* Full viewport height */
+          border-radius: 0; /* Remove border-radius */
+          box-shadow: none; /* Remove shadow */
+          border: none; /* Remove border */
+          overflow: auto; /* Allow scrolling if content overflows */
+        }
+
+        /* Hapus status bar di HP */
+        .status-bar {
+          display: none;
+        }
+
+        .dashboard-content {
+          padding: 15px; /* Adjust padding for smaller screens */
+          flex-grow: 1; /* Penting: agar konten mengambil ruang sisa */
+        }
+
+        .dashboard-header {
+          padding: 20px 15px; /* Adjust padding for smaller screens */
+        }
+
+        .card {
+          padding: 20px; /* Adjust card padding for smaller screens */
+          margin-bottom: 15px; /* Adjust margin for smaller screens */
+        }
       }
 
       .battery-wifi {
@@ -141,6 +182,7 @@
         padding: 25px;
         background: #f8f9fa;
         min-height: 500px;
+        flex-grow: 1; /* Allow content to grow and take available space */
       }
 
       /* Card Styles */
@@ -376,6 +418,7 @@
         font-size: 12px;
         border-top: 2px solid #e9ecef;
         background: #f8f9fa;
+        margin-top: auto; /* Penting: dorong footer ke bawah */
       }
 
       .footer div:first-child {
@@ -460,14 +503,6 @@
         background: rgba(253, 126, 20, 0.2);
         color: #fd7e14;
         border: 1px solid #fd7e14;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 420px) {
-        .phone-container {
-          width: 100%;
-          max-width: 350px;
-        }
       }
     </style>
   </head>
